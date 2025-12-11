@@ -11,13 +11,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install uv for fast package installation
 RUN pip install --no-cache-dir uv
 
-# Copy dependency files
+# Copy project files needed for installation
 COPY pyproject.toml ./
+COPY src/ ./src/
 
-# Create virtual environment and install dependencies
+# Create virtual environment and install the package
 RUN python -m venv /app/.venv
 ENV PATH="/app/.venv/bin:$PATH"
-RUN uv pip install -e .
+RUN uv pip install .
 
 # Production stage
 FROM python:3.14-slim AS production
