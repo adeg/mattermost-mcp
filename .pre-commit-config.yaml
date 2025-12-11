@@ -1,0 +1,137 @@
+# Pre-commit Configuration for Python/FastMCP/FastAPI Project
+# To install: pip install pre-commit && pre-commit install
+# To run manually: pre-commit run --all-files
+# To update hooks: pre-commit autoupdate
+
+default_language_version:
+  python: python3.14
+
+repos:
+  # ============================================================================
+  # General File Checks
+  # ============================================================================
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: [--maxkb=1024]
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+      - id: detect-private-key
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: check-json
+      - id: check-toml
+      - id: check-symlinks
+      - id: destroyed-symlinks
+
+  # ============================================================================
+  # Security & Secret Detection
+  # ============================================================================
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.0
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: |
+          (?x)^(
+            \.venv/.*|
+            .*\.lock$|
+            package-lock\.json$
+          )
+
+  # ============================================================================
+  # Python Linting & Formatting
+  # ============================================================================
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.8
+    hooks:
+      # Ruff linter (replaces flake8, pylint, etc.)
+      - id: ruff-check
+        args:
+          - --fix
+        files: \.py$
+        exclude: |
+          (?x)^(
+            \.venv/.*|
+            __pycache__/.*
+          )
+      # Ruff formatter (replaces black)
+      - id: ruff-format
+        files: \.py$
+        exclude: |
+          (?x)^(
+            \.venv/.*|
+            __pycache__/.*
+          )
+
+  # ============================================================================
+  # Python Type Checking
+  # ============================================================================
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.19.0
+    hooks:
+      - id: mypy
+        additional_dependencies:
+          - pydantic>=2.10
+          - types-requests
+        args:
+          - --ignore-missing-imports
+          - --no-strict-optional
+        files: \.py$
+        exclude: |
+          (?x)^(
+            \.venv/.*|
+            __pycache__/.*|
+            tests/.*
+          )
+
+  # ============================================================================
+  # Markdown
+  # ============================================================================
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.47.0
+    hooks:
+      - id: markdownlint
+        args:
+          - --fix
+        exclude: |
+          (?x)^(
+            \.venv/.*
+          )
+
+  # ============================================================================
+  # File Permissions
+  # ============================================================================
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.5
+    hooks:
+      - id: forbid-crlf
+      - id: remove-crlf
+      - id: forbid-tabs
+        exclude: |
+          (?x)^(
+            Makefile
+          )
+
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit hooks
+
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_schedule: weekly
+  submodules: false

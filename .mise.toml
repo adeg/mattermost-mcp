@@ -1,0 +1,9 @@
+# Mise configuration for Python/FastMCP/FastAPI project
+# Automatically creates and activates virtual environment
+
+[tools]
+python = "3.14"
+
+[env]
+# Automatically create and activate virtual environment
+_.python.venv = { path = ".venv", create = true }
