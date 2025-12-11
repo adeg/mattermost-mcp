@@ -52,14 +52,16 @@ class MattermostClient:
             host, port_str = host.rsplit(":", 1)
             port = int(port_str)
 
-        # Use TypedDriver (new API) instead of deprecated dict-based Driver
+        # TypedDriver requires options as a dict parameter
         self._driver = TypedDriver(
-            url=host,
-            token=settings.mattermost_token,
-            scheme=scheme,
-            port=port,
-            verify=True,
-            timeout=30,
+            options={
+                "url": host,
+                "token": settings.mattermost_token,
+                "scheme": scheme,
+                "port": port,
+                "verify": True,
+                "timeout": 30,
+            }
         )
         self._team_id = settings.mattermost_team_id
         self._logged_in = False
@@ -92,9 +94,10 @@ class MattermostClient:
         """
         await self.login()
         channels_data = await to_thread(
-            self._driver.channels.get_public_channels,
+            self._driver.channels.get_public_channels_for_team,
             self._team_id,
-            params={"per_page": limit, "page": page},
+            page=page,
+            per_page=limit,
         )
 
         channels = [Channel(**c) for c in channels_data]
@@ -124,7 +127,7 @@ class MattermostClient:
         """
         await self.login()
         channel_data = await to_thread(
-            self._driver.channels.get_channel_by_name_and_team_name,
+            self._driver.channels.get_channel_by_name,
             self._team_id,
             channel_name,
         )
@@ -147,7 +150,8 @@ class MattermostClient:
         posts_data = await to_thread(
             self._driver.posts.get_posts_for_channel,
             channel_id,
-            params={"per_page": limit, "page": page},
+            page=page,
+            per_page=limit,
         )
 
         posts = {pid: Post(**pdata) for pid, pdata in posts_data.get("posts", {}).items()}
@@ -230,7 +234,7 @@ class MattermostClient:
         user_id = me["id"]
 
         reaction_data = await to_thread(
-            self._driver.reactions.create_reaction,
+            self._driver.reactions.save_reaction,
             options={
                 "user_id": user_id,
                 "post_id": post_id,
@@ -254,7 +258,8 @@ class MattermostClient:
         await self.login()
         users_data = await to_thread(
             self._driver.users.get_users,
-            params={"per_page": limit, "page": page},
+            page=page,
+            per_page=limit,
         )
 
         users = [User(**u) for u in users_data]
