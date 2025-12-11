@@ -1,6 +1,6 @@
 """Configuration management using Pydantic Settings."""
 
-from pydantic import Field, field_validator
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -21,20 +21,24 @@ class MonitoringConfig(BaseSettings):
 
     enabled: bool = False
     schedule: str = "*/5 * * * *"
-    channels: list[str] = Field(default_factory=list)
-    topics: list[str] = Field(default_factory=list)
+    channels: str = ""  # Comma-separated channel names
+    topics: str = ""  # Comma-separated topic keywords
     message_limit: int = 50
     state_path: str = "./monitor-state.json"
     process_existing_on_first_run: bool = Field(default=False, validation_alias="MONITORING_PROCESS_EXISTING")
     first_run_limit: int = 10
 
-    @field_validator("channels", "topics", mode="before")
-    @classmethod
-    def parse_comma_separated(cls, v: str | list[str]) -> list[str]:
-        """Parse comma-separated string into list."""
-        if isinstance(v, str):
-            return [item.strip() for item in v.split(",") if item.strip()]
-        return v
+    def get_channels(self) -> list[str]:
+        """Parse comma-separated channels into list."""
+        if not self.channels:
+            return []
+        return [c.strip() for c in self.channels.split(",") if c.strip()]
+
+    def get_topics(self) -> list[str]:
+        """Parse comma-separated topics into list."""
+        if not self.topics:
+            return []
+        return [t.strip() for t in self.topics.split(",") if t.strip()]
 
 
 class Settings(BaseSettings):

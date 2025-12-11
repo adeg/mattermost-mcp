@@ -34,7 +34,7 @@ class TopicMonitor:
         self._analyzer = MessageAnalyzer(
             client=client,
             state_manager=self._state_manager,
-            topics=config.topics,
+            topics=config.get_topics(),
             message_limit=config.message_limit,
             llm_config=llm_config,
         )
@@ -171,7 +171,7 @@ class TopicMonitor:
             is_first_run = not self._config.process_existing_on_first_run
 
             # Analyze each configured channel
-            for channel_name in self._config.channels:
+            for channel_name in self._config.get_channels():
                 result = await self._analyzer.analyze_channel(
                     channel_name=channel_name,
                     first_run=is_first_run,

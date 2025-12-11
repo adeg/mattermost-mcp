@@ -59,8 +59,8 @@ async def app_lifespan(app: FastAPI) -> AsyncIterator[None]:
             await init_monitor(client, monitoring_config, llm_config)
             logger.info(
                 "Monitoring system initialized",
-                channels=monitoring_config.channels,
-                topics=monitoring_config.topics,
+                channels=monitoring_config.get_channels(),
+                topics=monitoring_config.get_topics(),
                 schedule=monitoring_config.schedule,
             )
         except Exception as e:
