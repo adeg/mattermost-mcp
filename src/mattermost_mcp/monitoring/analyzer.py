@@ -183,7 +183,7 @@ class MessageAnalyzer:
         try:
             # Format posts for the prompt
             formatted_posts = "\n\n".join(
-                f'[ID: {p["id"]}] [{datetime.fromtimestamp(p["create_at"] / 1000, tz=UTC).isoformat()}] '
+                f"[ID: {p['id']}] [{datetime.fromtimestamp(p['create_at'] / 1000, tz=UTC).isoformat()}] "
                 f'{p.get("user_info", {}).get("username", p["user_id"])}: "{p["message"]}"'
                 for p in posts
             )
@@ -193,7 +193,7 @@ class MessageAnalyzer:
 
             prompt = f"""You are analyzing messages from a Mattermost channel named "{channel_name}".
 
-Your task is to determine which messages are related to any of these topics: {', '.join(self._topics)}
+Your task is to determine which messages are related to any of these topics: {", ".join(self._topics)}
 
 Here are the messages:
 {formatted_posts}

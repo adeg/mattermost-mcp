@@ -1,7 +1,6 @@
 """Pytest configuration and fixtures."""
 
 import os
-from collections.abc import AsyncIterator
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest

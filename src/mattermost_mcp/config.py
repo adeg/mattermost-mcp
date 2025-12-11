@@ -29,7 +29,7 @@ class MonitoringConfig(BaseSettings):
     first_run_limit: int = Field(default=10, alias="MONITORING_FIRST_RUN_LIMIT")
 
     @classmethod
-    def from_env(cls) -> "MonitoringConfig":
+    def from_env(cls) -> MonitoringConfig:
         """Create config from environment variables with comma-separated list parsing."""
         import os
 

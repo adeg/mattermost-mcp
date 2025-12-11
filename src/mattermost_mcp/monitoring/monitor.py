@@ -233,7 +233,7 @@ class TopicMonitor:
                 message_link = f"{base_url}/{team_id}/pl/{post.id}"
 
                 topics_str = ", ".join(result.relevant_topics)
-                message += f"- [{timestamp} ({author})]({message_link}): \"{post.message[:100]}{'...' if len(post.message) > 100 else ''}\"\n"
+                message += f'- [{timestamp} ({author})]({message_link}): "{post.message[:100]}{"..." if len(post.message) > 100 else ""}"\n'
                 message += f"  Topics: **{topics_str}**\n\n"
 
             if len(result.posts) > 5:

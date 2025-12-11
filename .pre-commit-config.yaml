@@ -43,12 +43,12 @@ repos:
     rev: v1.5.0
     hooks:
       - id: detect-secrets
-        args: ['--baseline', '.secrets.baseline']
         exclude: |
           (?x)^(
             \.venv/.*|
             .*\.lock$|
-            package-lock\.json$
+            package-lock\.json$|
+            \.env\.example$
           )
 
   # ============================================================================

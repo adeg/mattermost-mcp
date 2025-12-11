@@ -1,7 +1,7 @@
 """Main entry point for the Mattermost MCP server."""
 
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from typing import AsyncIterator
 
 from fastapi import FastAPI
 
@@ -10,11 +10,11 @@ from mattermost_mcp.api.health import router as health_router
 from mattermost_mcp.clients.mattermost import close_client, get_mattermost_client, init_client
 from mattermost_mcp.config import get_llm_config, get_monitoring_config, get_settings
 from mattermost_mcp.logging import get_logger, setup_logging
-from mattermost_mcp.monitoring.monitor import init_monitor, stop_monitor
 
 # Import tools to register them with the MCP server
 from mattermost_mcp.mcp import tools as _tools  # noqa: F401
 from mattermost_mcp.mcp.server import mcp
+from mattermost_mcp.monitoring.monitor import init_monitor, stop_monitor
 
 logger = get_logger(__name__)
 
@@ -81,9 +81,8 @@ mcp_app = mcp.http_app(path="/mcp")
 @asynccontextmanager
 async def combined_lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Combined lifespan manager for FastAPI and FastMCP."""
-    async with app_lifespan(app):
-        async with mcp_app.lifespan(app):
-            yield
+    async with app_lifespan(app), mcp_app.lifespan(app):
+        yield
 
 
 # Create the FastAPI application
