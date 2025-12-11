@@ -3,7 +3,7 @@
 from asyncio import to_thread
 from typing import Any
 
-from mattermostautodriver import Driver
+from mattermostautodriver import TypedDriver
 
 from mattermost_mcp.config import get_settings
 from mattermost_mcp.logging import get_logger
@@ -52,15 +52,14 @@ class MattermostClient:
             host, port_str = host.rsplit(":", 1)
             port = int(port_str)
 
-        self._driver = Driver(
-            {
-                "url": host,
-                "token": settings.mattermost_token,
-                "scheme": scheme,
-                "port": port,
-                "verify": True,
-                "timeout": 30,
-            }
+        # Use TypedDriver (new API) instead of deprecated dict-based Driver
+        self._driver = TypedDriver(
+            url=host,
+            token=settings.mattermost_token,
+            scheme=scheme,
+            port=port,
+            verify=True,
+            timeout=30,
         )
         self._team_id = settings.mattermost_team_id
         self._logged_in = False
