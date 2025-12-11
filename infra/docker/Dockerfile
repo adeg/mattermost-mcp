@@ -25,8 +25,10 @@ FROM python:3.14-slim AS production
 
 WORKDIR /app
 
-# Create non-root user
-RUN groupadd -r mcp && useradd -r -g mcp mcp
+# Install curl for healthcheck and create non-root user
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd -r mcp && useradd -r -g mcp mcp
 
 # Copy virtual environment from builder
 COPY --from=builder /app/.venv /app/.venv
@@ -55,7 +57,7 @@ EXPOSE 8000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import httpx; httpx.get('http://localhost:8000/health').raise_for_status()"
+    CMD curl -f http://localhost:8000/health || exit 1
 
 # Start server
 CMD ["python", "-m", "mattermost_mcp.main"]
